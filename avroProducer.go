@@ -61,6 +61,15 @@ func (ap *AvroProducer) Add(topic string, schema string, key []byte, value []byt
 		SchemaID: schemaId,
 		Content:  binaryValue,
 	}
+
+	//Encoding and adding magic byte
+	magicByteWithBynaryMsg, err := binaryMsg.Encode()
+	if err != nil {
+		return err
+	}
+
+	binaryMsg.Content = magicByteWithBynaryMsg
+
 	msg := &sarama.ProducerMessage{
 		Topic: topic,
 		Key:   sarama.StringEncoder(key),
@@ -88,9 +97,9 @@ func (a *AvroEncoder) Encode() ([]byte, error) {
 	// Confluent serialization format version number; currently always 0.
 	binaryMsg = append(binaryMsg, byte(0))
 	// 4-byte schema ID as returned by Schema Registry
-	binarySchemaId := make([]byte, 4)
-	binary.BigEndian.PutUint32(binarySchemaId, uint32(a.SchemaID))
-	binaryMsg = append(binaryMsg, binarySchemaId...)
+	binarySchemaID := make([]byte, 4)
+	binary.BigEndian.PutUint32(binarySchemaID, uint32(a.SchemaID))
+	binaryMsg = append(binaryMsg, binarySchemaID...)
 	// Avro serialized data in Avro's binary encoding
 	binaryMsg = append(binaryMsg, a.Content...)
 	return binaryMsg, nil
