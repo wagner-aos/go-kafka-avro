@@ -33,7 +33,8 @@ func NewAvroProducer(kafkaServers []string, schemaRegistryServers []string) (*Av
 
 //GetSchemaId get schema id from schema-registry service
 func (ap *AvroProducer) GetSchemaId(topic string, avroCodec *goavro.Codec) (int, error) {
-	schemaId, err := ap.schemaRegistryClient.CreateSubject(topic+"-value", avroCodec)
+	schemaId, err := ap.schemaRegistryClient.CreateSubject(topic, avroCodec)
+	//schemaId, err := ap.schemaRegistryClient.CreateSubject(topic+"-value", avroCodec)
 	if err != nil {
 		return 0, err
 	}
